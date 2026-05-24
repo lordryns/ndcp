@@ -1,5 +1,6 @@
 import socket 
 import sys 
+import threading 
 
 host = socket.gethostbyname(socket.gethostname())
 port = 8118
@@ -13,9 +14,14 @@ except:
     sys.exit(1)
 
 
+def listen():
+    while True:
+        res = sock.recv(2048)
+        print(res.decode())
+
+threading.Thread(target=listen, daemon=True).start()
 while True:
     message = input("> ")
     sock.sendall(str.encode(message + "\n"))
 
-    res = sock.recv(2048)
-    print(res.decode())
+    

@@ -7,6 +7,8 @@ import (
 	"net"
 )
 
+var clients []net.Conn
+
 func main() {
 	log.Println("Starting server...")
 	listener, err := net.Listen("tcp", ":8118")
@@ -28,6 +30,7 @@ func main() {
 
 func handleConnection(conn net.Conn) {
 	defer conn.Close()
+	clients = append(clients, conn)
 	reader := bufio.NewReader(conn)
 	sender := conn.RemoteAddr().String()
 
@@ -38,10 +41,11 @@ func handleConnection(conn net.Conn) {
 		}
 
 		response := fmt.Sprintf("message from (%v): %v", sender, message)
-		log.Println(response)
-		_, err = conn.Write([]byte(response))
-		if err != nil {
-			log.Println("err: ", err.Error())
+		for _, client := range clients {
+			if client != conn {
+				client.Write([]byte(response))
+			}
 		}
+
 	}
 }
