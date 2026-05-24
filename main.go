@@ -38,6 +38,7 @@ func handleConnection(conn net.Conn) {
 		message, err := reader.ReadString('\n')
 		if err != nil {
 			log.Println("err: ", err.Error())
+			return
 		}
 
 		response := fmt.Sprintf("message from (%v): %v", sender, message)
